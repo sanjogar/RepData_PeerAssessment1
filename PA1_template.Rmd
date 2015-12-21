@@ -1,25 +1,123 @@
 ---
 title: "Reproducible Research: Peer Assessment 1"
 output: 
-  html_document:
+  html_document: 
     keep_md: true
 ---
 
 
 ## Loading and preprocessing the data
-
+```{r processing, echo=TRUE}
+library(ggplot2)
+library(dplyr)
+datafile <- "activity.csv"
+df <- read.csv(datafile)
+df$date <- as.Date(df$date)
+```
 
 
 ## What is mean total number of steps taken per day?
+1. Calculate the total number of steps taken per day:
+```{r totsteps, echo=TRUE}
+groupday <- group_by(df, date)
+stepstotday <- summarise(groupday, steps = sum(steps, na.rm = TRUE))
+#stepstotday <- tapply(df$steps, df$date, sum, na.rm = TRUE)
+```
+2. Histogram of the total number of steps taken each day
+```{r histograms, echo=TRUE, fig.height=3}
+qplot(steps, data = stepstotday)+ 
+    labs(title = "Total number of steps per day", y = "Number of days", 
+        x ="Total number of steps")
+```
 
-
+3. Mean and median of the total number of steps taken per day:
+```{r meanmedia, echo=TRUE}
+meansteps <- mean(stepstotday$steps, na.rm = TRUE)
+mediansteps <- median(stepstotday$steps, na.rm = TRUE)
+```
+The mean of the total number of steps per day is `r meansteps` and the median is `r mediansteps`.
 
 ## What is the average daily activity pattern?
+1. Average number of steps of each 5-minutes interval averaged across all days:
+```{r intervstep, echo=TRUE, fig.height=3}
+stepsinterv <- tapply(df$steps, df$interval, mean, na.rm = TRUE)
+interval <- unique(df$interval)
+plot(interval, stepsinterv, type = "l", main = "Averaged number steps", ylab = "Number steps", xlab = "Interval")
+```
 
 
+2. The 5-minutes interval with the maximum number of steps, averged across all the days:
+```{r maxstep, echo=TRUE}
+maxstepinterv <- max(stepsinterv)
+ma <- which(stepsinterv == maxstepinterv)
+maxstep <- interval[ma[1]]
+```
+That interval is `r maxstep`.
 
 ## Imputing missing values
+1. Total number of missing values:
+```{r missing, echo=TRUE}
+natot <- sum(is.na(df$steps))
+```
+The total number of missing values in the dataset is `r natot`.
 
+
+2. & 3. Filling in all of the missing values in the dataset and store them in a new dataset (missing data filled in):
+```{r newdf, echo=TRUE}
+newdf <- df
+naa <- which(is.na(df$steps))
+# Filling the NA values with the mean for that 5-minute interval (stepsinterv)
+for (i in 1:length(naa)){
+    temint <- df$interval[naa[i]]
+    ind <- which(interval == temint)
+    newdf$steps[naa[i]] <- stepsinterv[ind]
+}
+sum(is.na(newdf$steps))
+head(newdf)
+```
+
+4. Histogram of the total number of steps for each day:
+```{r newdfcalc, echo = TRUE, fig.height = 3}
+nstepstotday <- tapply(newdf$steps, newdf$date, sum, na.rm = TRUE)
+hist(nstepstotday, main = "Total number of steps per day", xlab = "Total number of steps", ylab = "Number of days")
+newmean <- mean(nstepstotday, na.rm = TRUE)
+newmedian <- median(nstepstotday, na.rm = TRUE)
+```
+
+The mean of the total number of steps taken per day is `r newmean` and the median is `r newmedian`.
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+1. New factor variable in the dataset with two levels, *weekday* and *weekend*, indicating whether a given date is a weekday or weekend day.
+```{r newdffactor, echo=TRUE}
+week <- weekdays(newdf$date)
+weekend <- which(week == "Saturday" | week == "Sunday")
+week[weekend] <- "weekend"
+week[-weekend] <- "weekday"
+# Adding the factor variable:
+newdf$daytype <- as.factor(week)
+str(newdf)
+```
+
+2. Time series plot of the 5-minute interval and the average number of steps taken, averaged across all weekday days or weekend days:
+```{r newdfplot, echo=TRUE}
+library(ggplot2)
+
+te <- newdf %>% group_by(daytype, interval)
+ff <- te %>% summarise_each(funs(mean(., na.rm=TRUE)))
+
+ggplot(ff, aes(interval, steps)) + 
+              facet_grid(daytype ~., scales = "free_y") +
+              geom_line(aes(color = daytype), size = 0.75) +
+              labs(title = "Averaged number of steps for the weekdays and weekends", 
+                   y = "Number of steps", x ="Interval") +
+              theme(plot.title = element_text(size = rel(1.4))) + 
+              theme(legend.position = "none") + 
+              theme(strip.text.y = element_text(size = 15, angle = 90, face = "bold"))
+
+# library(lattice)              
+# xyplot(steps ~ interval | daytype, data = ff, type="l")
+```
+
+    
