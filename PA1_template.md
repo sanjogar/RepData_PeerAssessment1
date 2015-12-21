@@ -6,11 +6,15 @@ output:
 ---
 
 
+```r
+# Packages:
+library(ggplot2)
+library(dplyr)
+```
+
 ## Loading and preprocessing the data
 
 ```r
-library(ggplot2)
-library(dplyr)
 datafile <- "activity.csv"
 df <- read.csv(datafile)
 df$date <- as.Date(df$date)
@@ -45,7 +49,7 @@ qplot(steps, data = stepstotday)+
 meansteps <- mean(stepstotday$steps, na.rm = TRUE)
 mediansteps <- median(stepstotday$steps, na.rm = TRUE)
 ```
-The mean of the total number of steps per day is 9354.2295082 and the median is 10395.
+The mean of the total number of steps per day is 9354.23 and the median is 10395.
 
 ## What is the average daily activity pattern?
 1. Average number of steps of each 5-minutes interval averaged across all days:
@@ -53,20 +57,20 @@ The mean of the total number of steps per day is 9354.2295082 and the median is 
 ```r
 stepsinterv <- tapply(df$steps, df$interval, mean, na.rm = TRUE)
 interval <- unique(df$interval)
-plot(interval, stepsinterv, type = "l", main = "Averaged number steps", ylab = "Number steps", xlab = "Interval")
+plot(interval, stepsinterv, type = "l", main = "Averaged number steps per interval", ylab = "Number steps", xlab = "Interval")
 ```
 
 ![plot of chunk intervstep](figure/intervstep-1.png) 
 
 
-2. The 5-minutes interval with the maximum number of steps, averged across all the days:
+2. The 5-minutes interval with the maximum number of steps, averged across all the days, is:
 
 ```r
 maxstepinterv <- max(stepsinterv)
 ma <- which(stepsinterv == maxstepinterv)
 maxstep <- interval[ma[1]]
 ```
-That interval is 835.
+The interval 835.
 
 ## Imputing missing values
 1. Total number of missing values:
@@ -113,7 +117,7 @@ head(newdf)
 
 ```r
 nstepstotday <- tapply(newdf$steps, newdf$date, sum, na.rm = TRUE)
-hist(nstepstotday, main = "Total number of steps per day", xlab = "Total number of steps", ylab = "Number of days")
+hist(nstepstotday, main = "Total number of steps per day", xlab = "Number of steps", ylab = "Number of days")
 ```
 
 ![plot of chunk newdfcalc](figure/newdfcalc-1.png) 
@@ -123,7 +127,7 @@ newmean <- mean(nstepstotday, na.rm = TRUE)
 newmedian <- median(nstepstotday, na.rm = TRUE)
 ```
 
-The mean of the total number of steps taken per day is 1.0766189 &times; 10<sup>4</sup> and the median is 1.0766189 &times; 10<sup>4</sup>.
+The mean of the total number of steps taken per day is 10766.19 and the median is 10766.19, which are larger than those obtained when the missing data were not considered or replaced.
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
@@ -151,8 +155,6 @@ str(newdf)
 2. Time series plot of the 5-minute interval and the average number of steps taken, averaged across all weekday days or weekend days:
 
 ```r
-library(ggplot2)
-
 te <- newdf %>% group_by(daytype, interval)
 ff <- te %>% summarise_each(funs(mean(., na.rm=TRUE)))
 
@@ -171,6 +173,9 @@ ggplot(ff, aes(interval, steps)) +
 ```r
 # library(lattice)              
 # xyplot(steps ~ interval | daytype, data = ff, type="l")
+
+#knit2html("PA1_template.Rmd")
+#browseURL("PA1_template.html")
 ```
 
     
