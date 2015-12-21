@@ -1,4 +1,9 @@
-# Reproducible Research: Peer Assessment 1
+---
+title: "Reproducible Research: Peer Assessment 1"
+output: 
+  html_document: 
+    keep_md: true
+---
 
 
 ## Loading and preprocessing the data
@@ -6,22 +11,6 @@
 ```r
 library(ggplot2)
 library(dplyr)
-```
-
-```
-## 
-## Attaching package: 'dplyr'
-## 
-## The following objects are masked from 'package:stats':
-## 
-##     filter, lag
-## 
-## The following objects are masked from 'package:base':
-## 
-##     intersect, setdiff, setequal, union
-```
-
-```r
 datafile <- "activity.csv"
 df <- read.csv(datafile)
 df$date <- as.Date(df$date)
@@ -48,7 +37,7 @@ qplot(steps, data = stepstotday)+
 ## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
 ```
 
-![](PA1_template_files/figure-html/histograms-1.png) 
+![plot of chunk histograms](figure/histograms-1.png) 
 
 3. Mean and median of the total number of steps taken per day:
 
@@ -67,7 +56,7 @@ interval <- unique(df$interval)
 plot(interval, stepsinterv, type = "l", main = "Averaged number steps", ylab = "Number steps", xlab = "Interval")
 ```
 
-![](PA1_template_files/figure-html/intervstep-1.png) 
+![plot of chunk intervstep](figure/intervstep-1.png) 
 
 
 2. The 5-minutes interval with the maximum number of steps, averged across all the days:
@@ -127,14 +116,14 @@ nstepstotday <- tapply(newdf$steps, newdf$date, sum, na.rm = TRUE)
 hist(nstepstotday, main = "Total number of steps per day", xlab = "Total number of steps", ylab = "Number of days")
 ```
 
-![](PA1_template_files/figure-html/newdfcalc-1.png) 
+![plot of chunk newdfcalc](figure/newdfcalc-1.png) 
 
 ```r
 newmean <- mean(nstepstotday, na.rm = TRUE)
 newmedian <- median(nstepstotday, na.rm = TRUE)
 ```
 
-The mean of the total number of steps taken per day is 1.0766189\times 10^{4} and the median is 1.0766189\times 10^{4}.
+The mean of the total number of steps taken per day is 1.0766189 &times; 10<sup>4</sup> and the median is 1.0766189 &times; 10<sup>4</sup>.
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
@@ -177,7 +166,7 @@ ggplot(ff, aes(interval, steps)) +
               theme(strip.text.y = element_text(size = 15, angle = 90, face = "bold"))
 ```
 
-![](PA1_template_files/figure-html/newdfplot-1.png) 
+![plot of chunk newdfplot](figure/newdfplot-1.png) 
 
 ```r
 # library(lattice)              
