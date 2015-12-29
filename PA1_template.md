@@ -1,8 +1,9 @@
 ---
 title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document: 
-    keep_md: true
+Date: December 20, 2015
+Output:
+  html_document 
+keep_md: true
 ---
 
 
@@ -18,6 +19,7 @@ library(dplyr)
 datafile <- "activity.csv"
 df <- read.csv(datafile)
 df$date <- as.Date(df$date)
+# or: df$date <- as.Date(df$date, format = "%Y-%m-%d")
 ```
 
 
@@ -34,7 +36,7 @@ stepstotday <- summarise(groupday, steps = sum(steps, na.rm = TRUE))
 ```r
 qplot(steps, data = stepstotday)+ 
     labs(title = "Total number of steps per day", y = "Number of days", 
-        x ="Total number of steps")
+        x ="Number of steps")
 ```
 
 ```
@@ -57,7 +59,7 @@ The mean of the total number of steps per day is 9354.23 and the median is 10395
 ```r
 stepsinterv <- tapply(df$steps, df$interval, mean, na.rm = TRUE)
 interval <- unique(df$interval)
-plot(interval, stepsinterv, type = "l", main = "Averaged number steps per interval", ylab = "Number steps", xlab = "Interval")
+plot(interval, stepsinterv, type = "l", main = "Averaged number steps per 5 min interval", ylab = "Number steps", xlab = "Interval", col = "blue", lwd = 2 )
 ```
 
 ![plot of chunk intervstep](figure/intervstep-1.png) 
@@ -66,9 +68,12 @@ plot(interval, stepsinterv, type = "l", main = "Averaged number steps per interv
 2. The 5-minutes interval with the maximum number of steps, averged across all the days, is:
 
 ```r
-maxstepinterv <- max(stepsinterv)
-ma <- which(stepsinterv == maxstepinterv)
+ma <- which.max(stepsinterv)
 maxstep <- interval[ma[1]]
+## or the long way, as I submitted:
+# maxstepinterv <- max(stepsinterv)
+# ma <- which(stepsinterv == maxstepinterv)
+# maxstep <- interval[ma[1]]
 ```
 The interval 835.
 
@@ -84,22 +89,16 @@ The total number of missing values in the dataset is 2304.
 2. & 3. Filling in all of the missing values in the dataset and store them in a new dataset (missing data filled in):
 
 ```r
+# Create a DF as the original one:
 newdf <- df
+# Localise the index where there are missing values (NA):
 naa <- which(is.na(df$steps))
-# Filling the NA values with the mean for that 5-minute interval (stepsinterv)
+# Fill the NA values with the mean for that 5-minute interval (stepsinterv):
 for (i in 1:length(naa)){
     temint <- df$interval[naa[i]]
     ind <- which(interval == temint)
     newdf$steps[naa[i]] <- stepsinterv[ind]
 }
-sum(is.na(newdf$steps))
-```
-
-```
-## [1] 0
-```
-
-```r
 head(newdf)
 ```
 
@@ -113,11 +112,26 @@ head(newdf)
 ## 6 2.0943396 2012-10-01       25
 ```
 
+```r
+## Nicer and tidier way:
+### Create DF with only the NA rows
+#    missing_data <- activity_data[is.na(activity_data),]
+### merge NA rows with the interval means from Step 3
+#    temp <- merge(missing_data, intervaldata, by = "interval")
+### replace steps with mean
+#    temp$steps <- temp$mean_steps
+### drop the mean column
+#    temp$mean_steps <- NULL
+### append imputed missing values to the DF from Step 1 that did not include the NA rows
+#    activity_data_imputed = rbind(activity_data_comp, temp)
+```
+*Checking*: The number of missing values (NAs) in the new dataframe is: 0.
+
 4. Histogram of the total number of steps for each day:
 
 ```r
 nstepstotday <- tapply(newdf$steps, newdf$date, sum, na.rm = TRUE)
-hist(nstepstotday, main = "Total number of steps per day", xlab = "Number of steps", ylab = "Number of days")
+hist(nstepstotday, main = "Total number of steps per day without NAs", xlab = "Number of steps", ylab = "Number of days")
 ```
 
 ![plot of chunk newdfcalc](figure/newdfcalc-1.png) 
@@ -127,7 +141,7 @@ newmean <- mean(nstepstotday, na.rm = TRUE)
 newmedian <- median(nstepstotday, na.rm = TRUE)
 ```
 
-The mean of the total number of steps taken per day is 10766.19 and the median is 10766.19, which are larger than those obtained when the missing data were not considered or replaced.
+The mean of the total number of steps taken per day is 10766.19 and the median is 10766.19, which are slightly larger than those obtained when the missing data were not considered or replaced.
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
@@ -177,5 +191,5 @@ ggplot(ff, aes(interval, steps)) +
 #knit2html("PA1_template.Rmd")
 #browseURL("PA1_template.html")
 ```
-
+Plot illustrates that earlier in the morning, the averaged of steps is lower during the weekends than during the rest of the weekdays while later in the day the number of steps is similar both during the weekend and weekdays (being slightly larger during the weekends). 
     
