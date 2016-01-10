@@ -106,7 +106,7 @@ newmean <- mean(nstepstotday)
 newmedian <- median(nstepstotday)
 ```
 
-The mean of the total number of steps taken per day is **`r sprintf("%.2f", newmean)`** and the median is **`r sprintf("%.2f", newmedian)`**, which are slightly larger than those obtained when the missing data were removed (specially for the mean parameter, which differs around a 14%). 
+The **mean** of the total number of steps taken per day is **`r sprintf("%.2f", newmean)`** and the **median** is **`r sprintf("%.2f", newmedian)`**, which are slightly larger than those obtained when the missing data were removed (specially for the mean parameter, which differs around a 14%). 
 
 Therefore, the presence of missing values can add some bias (even if small) into the calculations of certain parameters, such as the mean and median of the total number of steps per day. The impact of imputing missing data is not really big in this case, but this procedure needs to be thoroughly studied for each specific dataset analysed.
 
@@ -127,7 +127,7 @@ str(newdf)
 
 2. Time series plot of the 5-minute interval and the average number of steps taken, averaged across all weekday days or weekend days:
 ```{r newdfplot, echo=TRUE}
-# Grouping the updated dataframe into the type of day (weekday or weekend0, and interval:
+# Grouping the updated dataframe into the type of day (weekday or weekend), and interval:
 tem <- newdf %>% group_by(daytype, interval)
 # Calculating the mean for each of those groups:
 ff <- tem %>% summarise_each(funs(mean(., na.rm = TRUE)))
