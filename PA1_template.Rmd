@@ -99,7 +99,7 @@ for (i in 1:length(naa)){
 *Checking that the procedure has worked*: The number of missing values (NAs) in the new dataframe is: `r sum(is.na(newdf$steps))`.
 
 4. Histogram of the total number of steps for each day after filling in the missing values:
-```{r newdfcalc, echo = TRUE, fig.height = 4.5}
+```{r newdfcalc, echo = TRUE, fig.height = 5}
 nstepstotday <- tapply(newdf$steps, newdf$date, sum, na.rm = TRUE)
 hist(nstepstotday, main = "Total number of steps taken per day after replacing NAs", xlab = "Number of steps", ylab = "Number of days", breaks = 30, col = "darkgreen")
 newmean <- mean(nstepstotday)
