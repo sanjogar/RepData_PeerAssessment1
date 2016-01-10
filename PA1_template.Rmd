@@ -6,7 +6,7 @@ Output:
 keep_md: true
 ---
 
-```{r packages, echo=TRUE}
+```{r packages, echo = TRUE}
 # Libraries:
 library(knitr)
 library(ggplot2)
@@ -17,7 +17,7 @@ library(dplyr)
 ```
 
 ## Loading and preprocessing the data
-```{r processing, echo=TRUE}
+```{r processing, echo = TRUE}
 datafile <- "activity.csv"
 if (file.exists(datafile) != TRUE) {unzip("activity.zip")}
 df <- read.csv(datafile)
@@ -27,14 +27,14 @@ df$date <- as.Date(df$date, format = "%Y-%m-%d")
 
 ## What is mean total number of steps taken per day?
 1. Calculate the total number of steps taken per day (ignoring the missing values):
-```{r totsteps, echo=TRUE}
+```{r totsteps, echo = TRUE}
 # Grouped according to date:
 groupday <- group_by(df, date)
 stepstotday <- summarise(groupday, steps = sum(steps, na.rm = TRUE))
 ```
 
 2. Histogram of the total number of steps taken each day:
-```{r histograms, echo=TRUE, fig.height=3.5}
+```{r histograms, echo = TRUE, fig.height = 4}
 qplot(steps, data = stepstotday, bins = 30) + 
     labs(title = "Total number of steps taken per day", y = "Number of days", 
         x ="Number of steps") +  
@@ -42,7 +42,7 @@ qplot(steps, data = stepstotday, bins = 30) +
 ```
 
 3. Mean and median of the total number of steps taken per day:
-```{r meanmedia, echo=TRUE}
+```{r meanmedia, echo = TRUE}
 meansteps <- mean(stepstotday$steps)
 mediansteps <- median(stepstotday$steps)
 ```
@@ -53,7 +53,7 @@ These two quantites are calculated ignoring the missing values (NAs) when applyi
 
 ## What is the average daily activity pattern?
 1. Average number of steps of each 5-minutes interval averaged across all days:
-```{r intervstep, echo=TRUE, fig.height=4.5}
+```{r intervstep, echo = TRUE, fig.height = 5}
 stepsinterv <- tapply(df$steps, df$interval, mean, na.rm = TRUE)
 interval <- unique(df$interval)
 plot(interval, stepsinterv, type = "l", main = "Averaged number steps per 5-min interval", ylab = "Number of steps", xlab = "Interval", col = "blue", lwd = 2 )
@@ -64,7 +64,7 @@ There is a clear increase of number of steps between the 750 and 1000 time inter
 
 
 2. The 5-minutes interval with the maximum number of steps, averged across all the days:
-```{r maxstep, echo=TRUE}
+```{r maxstep, echo = TRUE}
 ma <- which.max(stepsinterv)
 maxstep <- interval[ma[1]]
 ```
@@ -73,7 +73,7 @@ The 5-min interval with the maximum number of steps is **`r maxstep`**.
 
 ## Imputing missing values
 1. Total number of missing values:
-```{r missing, echo=TRUE}
+```{r missing, echo = TRUE}
 NAtot <- sum(is.na(df$steps))
 ```
 The total number of missing values in the dataset is **`r NAtot`**.
@@ -83,7 +83,7 @@ The total number of missing values in the dataset is **`r NAtot`**.
 The missing values in a 5-min interval are filled in with the mean for that 5-minute interval calculated in the previous section. 
 
 3. Filling in all of the missing values in the dataset and store them in a new dataset (missing data filled in):
-```{r newdf, echo=TRUE}
+```{r newdf, echo = TRUE}
 # Create a DF as the original one:
 newdf <- df
 # Localise the index where there are missing values (NA):
@@ -114,7 +114,7 @@ Therefore, the presence of missing values can add some bias (even if small) into
 ## Are there differences in activity patterns between weekdays and weekends?
 
 1. New factor variable in the dataset with two levels, *weekday* and *weekend*, indicating whether a given date is a weekday or weekend day:
-```{r newdffactor, echo=TRUE}
+```{r newdffactor, echo = TRUE}
 week <- weekdays(newdf$date)
 weekend <- which(week == "Saturday" | week == "Sunday")
 week[weekend] <- "weekend"
@@ -126,7 +126,7 @@ str(newdf)
 ```
 
 2. Time series plot of the 5-minute interval and the average number of steps taken, averaged across all weekday days or weekend days:
-```{r newdfplot, echo=TRUE}
+```{r newdfplot, echo = TRUE}
 # Grouping the updated dataframe into the type of day (weekday or weekend), and interval:
 tem <- newdf %>% group_by(daytype, interval)
 # Calculating the mean for each of those groups:
